@@ -22,17 +22,17 @@
 // VIN - to 3V3 esp_32 pin
 // 3V3 - DON't CONNECT (weak power)
 // GND - to GND esp_32 pin
-// SCL - to GPIO_9
-// SDA - to GPIO_8
+// SCL - to GPIO_6
+// SDA - to GPIO_7
 
 
 #include <Arduino.h>
 #include <Wire.h>
 #include <AirSensor.h>
-//#include <TFT_eSPI.h>
+#include <TFT_eSPI.h>
 // #include <Adafruit_NeoPixel.h>
 
-//TFT_eSPI tft = TFT_eSPI();
+TFT_eSPI tft = TFT_eSPI();
 AirSensor airSensor;
 
 String temp_text = "";
@@ -55,13 +55,13 @@ void setup() {
   delay(1000); // Daj czas na stabilizację Serial
   Serial.println("\n\nSetup");
 
-  // Initialize I2C on GPIO8 (SDA) and GPIO9 (SCL)
-  Wire.begin(8, 9);
-  Serial.println("I2C initialized on GPIO8 (SDA), GPIO9 (SCL)");
+  // Initialize I2C on GPIO7 (SDA) and GPIO6 (SCL)
+  Wire.begin(7, 6);
+  Serial.println("I2C initialized on GPIO7 (SDA), GPIO6 (SCL)");
 
-  //tft.init();
-  //tft.setRotation(1);
-  //tft.fillScreen(TFT_BLACK);
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
 
   Serial.println("#-----/ENS160 (Indoor Air Quality) + AHT21 (temperature, humidity)/-----#");
   if (!airSensor.begin()) {
@@ -88,32 +88,34 @@ void loop() {
 
     //2. PRINT TEXT DATA
     //tft.loadFont(lemonMilkFont20);
-    //tft.setTextColor(0x8c71, TFT_BLACK, true);
-    //tft.drawString(tvoc_text,(tft.width()-tft.textWidth(tvoc_text))/2,((tft.height()-tft.fontHeight())/2)-50);
+    tft.setTextColor(0x8c71, TFT_BLACK, true);
+    tft.drawString(tvoc_text,(tft.width()-tft.textWidth(tvoc_text))/2,((tft.height()-tft.fontHeight())/2)-50);
 
     //tft.loadFont(lemonMilkFont40);
-    //tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
-    //tft.drawString(temp_text,(tft.width()-tft.textWidth(temp_text))/2,(tft.height()-tft.fontHeight())/2);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
+    tft.drawString(temp_text,(tft.width()-tft.textWidth(temp_text))/2,(tft.height()-tft.fontHeight())/2);
 
     //tft.loadFont(lemonMilkFont30);
-    //tft.setTextColor(0xce59, TFT_BLACK, true);
-    //tft.drawString(aqi_text,(tft.width()-tft.textWidth(aqi_text))/2,((tft.height()-tft.fontHeight())/2)+50);
+    tft.setTextColor(0xce59, TFT_BLACK, true);
+    tft.drawString(aqi_text,(tft.width()-tft.textWidth(aqi_text))/2,((tft.height()-tft.fontHeight())/2)+50);
 
     //3. DRAW ARCS
     //humidity (0-100 value to 45-315) <-- outer ring
-    //humidity_arc = ((27.0/10.0)*humidity_value)+45.0;
-    //tft.drawSmoothArc(tft.width()/2, tft.height()/2, 120, 110, 45, humidity_arc, 0x04bf, TFT_BLACK, true);
+    humidity_arc = ((27.0/10.0)*humidity_value)+45.0;
+    tft.drawSmoothArc(tft.width()/2, tft.height()/2, 120, 110, 45, humidity_arc, 0x04bf, TFT_BLACK, true);
       
     //co2 value <-- inner ring
-    //co2_arc = (((co2_value-400.0)*27.0)/80)+45;
-        //Serial.print("CO2:");
-        //Serial.println(co2_arc);
-        //  if(co2_value<=600){co2_arc_color = 0x8eff;} //change color for specific tresholds (excellent - target)
-        //  else if(co2_value<=800){co2_arc_color = 0x9772;}// (good - sufficient ventillation recommended)
-        //  else if(co2_value<=1000){co2_arc_color = 0xfea0;}// (moderate - increased ventillation recommended)
-        //  else if (co2_value<=1200){co2_arc_color = 0xfd20;}// (poor - intensified ventillation recommended)
-        //  else{co2_arc_color = 0xfa8a;}// (unhealthy - use only if unavoidable)
-    //tft.drawSmoothArc(tft.width()/2, tft.height()/2, 100, 90, 45, co2_arc, co2_arc_color, TFT_BLACK, true);//315
+    co2_arc = (((co2_value-400.0)*27.0)/80)+45;
+        Serial.print("CO2:");
+        Serial.println(co2_arc);
+          if(co2_value<=600){co2_arc_color = 0x8eff;} //change color for specific tresholds (excellent - target)
+          else if(co2_value<=800){co2_arc_color = 0x9772;}// (good - sufficient ventillation recommended)
+          else if(co2_value<=1000){co2_arc_color = 0xfea0;}// (moderate - increased ventillation recommended)
+          else if (co2_value<=1200){co2_arc_color = 0xfd20;}// (poor - intensified ventillation recommended)
+          else{co2_arc_color = 0xfa8a;}// (unhealthy - use only if unavoidable)
+    tft.drawSmoothArc(tft.width()/2, tft.height()/2, 100, 90, 45, co2_arc, co2_arc_color, TFT_BLACK, true);//315
+
+    //debugging
     Serial.println(temp_text);
     Serial.println(aqi_text);
     Serial.println(tvoc_text);
@@ -122,6 +124,6 @@ void loop() {
 
 
     delay(1000);
-    //tft.fillScreen(TFT_BLACK);  //tempopary fix for updating text and arcs (maybe there is a function of I will use the bigger black shape)
+    tft.fillScreen(TFT_BLACK);  //tempopary fix for updating text and arcs (maybe there is a function of I will use the bigger black shape)
     
 }

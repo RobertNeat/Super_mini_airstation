@@ -3,48 +3,18 @@
 AirSensor::AirSensor() : ens160(ENS160_I2CADDR_1), temperature(0), humidity(0), aqi(0), tvoc(0), co2(0) {}
 
 bool AirSensor::begin() {
-    Serial.println("\nDEBUG: Initializing sensors on default I2C (GPIO8 SDA, GPIO9 SCL)...");
-    Serial.flush();
-    delay(100);
-
-    // I2C scan to find connected devices
-    Serial.println("DEBUG: Scanning I2C bus for devices...");
-    Serial.flush();
-    byte address, error;
-    int nDevices = 0;
-
-    for (address = 1; address < 127; address++) {
-        Wire.beginTransmission(address);
-        error = Wire.endTransmission();
-        if (error == 0) {
-            Serial.print("DEBUG: I2C device found at 0x");
-            if (address < 16) Serial.print("0");
-            Serial.println(address, HEX);
-            nDevices++;
-        }
-    }
-
-    if (nDevices == 0) {
-        Serial.println("DEBUG: No I2C devices found! Check wiring and pull-up resistors!");
-        Serial.flush();
-        return false;
-    }
-    Serial.print("DEBUG: Found ");
-    Serial.print(nDevices);
-    Serial.println(" I2C device(s)");
-    Serial.flush();
-
-    Serial.println("DEBUG: Attempting to initialize AHT20...");
     Serial.flush();
     if (!aht.begin()) {
         Serial.println("Could not find AHT? Check wiring");
         Serial.flush();
         return false;
     }
-    Serial.println("DEBUG: AHT20 found!");
+    Serial.println("AHT20 found!");
     Serial.flush();
 
-    Serial.println("DEBUG: Attempting to initialize ENS160...");
+    // Set I2C pins for ENS160
+    ens160.setI2C(7, 6); // SDA, SCL
+
     Serial.flush();
     if (!ens160.begin()) {
         Serial.println("Could not find ENS160? Check wiring");
