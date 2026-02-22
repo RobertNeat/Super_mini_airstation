@@ -30,7 +30,11 @@
 #include <Wire.h>
 #include <AirSensor.h>
 #include <TFT_eSPI.h>
-// #include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
+#include <Fonts/Custom/Lemon_Milk_Font_10.h>
+#include <Fonts/Custom/Lemon_Milk_Font_20.h>
+#include <Fonts/Custom/Lemon_Milk_Font_30.h>
+#include <Fonts/Custom/Lemon_Milk_Font_40.h>
 
 TFT_eSPI tft = TFT_eSPI();
 AirSensor airSensor;
@@ -45,10 +49,10 @@ int humidity_arc = 0;
 int co2_arc = 0;
 uint16_t co2_arc_color = 0x8eff;
 
-// #define PIN        8
-// #define NUM_PIXELS 1
+#define PIN        8
+#define NUM_PIXELS 1
 
-// Adafruit_NeoPixel strip(NUM_PIXELS, PIN, NEO_GRB);
+Adafruit_NeoPixel strip(NUM_PIXELS, PIN, NEO_GRB);
 
 void setup() {
   Serial.begin(115200);//460800
@@ -68,6 +72,10 @@ void setup() {
       Serial.println("Failed to initialize sensors!");
       while (1) delay(10);
   }
+
+  strip.begin();
+  strip.setBrightness(32);
+  strip.show();
 }
 
 void loop() {
@@ -87,15 +95,15 @@ void loop() {
     co2_value = airSensor.getCO2();
 
     //2. PRINT TEXT DATA
-    //tft.loadFont(lemonMilkFont20);
+    tft.loadFont(lemonMilkFont20);
     tft.setTextColor(0x8c71, TFT_BLACK, true);
     tft.drawString(tvoc_text,(tft.width()-tft.textWidth(tvoc_text))/2,((tft.height()-tft.fontHeight())/2)-50);
 
-    //tft.loadFont(lemonMilkFont40);
+    tft.loadFont(lemonMilkFont40);
     tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
     tft.drawString(temp_text,(tft.width()-tft.textWidth(temp_text))/2,(tft.height()-tft.fontHeight())/2);
 
-    //tft.loadFont(lemonMilkFont30);
+    tft.loadFont(lemonMilkFont30);
     tft.setTextColor(0xce59, TFT_BLACK, true);
     tft.drawString(aqi_text,(tft.width()-tft.textWidth(aqi_text))/2,((tft.height()-tft.fontHeight())/2)+50);
 
@@ -122,8 +130,11 @@ void loop() {
     Serial.println(humidity_value);
     Serial.println(co2_value);
 
+    strip.setPixelColor(0,co2_value);
+    strip.show();
 
-    delay(1000);
+
+    delay(10000);
     tft.fillScreen(TFT_BLACK);  //tempopary fix for updating text and arcs (maybe there is a function of I will use the bigger black shape)
     
 }
