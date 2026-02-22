@@ -1,0 +1,9 @@
+1. Change "User_Setup.h"
+a) uncomment "#define GC9A01_DRIVER"
+b) uncomment setup for "// For ESP32 Dev board (only tested with GC9A01 display)"
+
+Copy the .pio/libdeps/TFT_eSPI
+into lib/TFT_eSPI
+
+The way of reffering to library does not change and is:
+#include <TFT_eSPI.h>
